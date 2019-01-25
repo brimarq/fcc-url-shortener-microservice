@@ -1,15 +1,15 @@
 'use strict';
 
-var express = require('express');
-var mongo = require('mongodb');
-var mongoose = require('mongoose');
+const express = require('express');
+const mongo = require('mongodb');
+const mongoose = require('mongoose');
+const dns = require('dns');
+const cors = require('cors');
 
-var cors = require('cors');
-
-var app = express();
+const app = express();
 
 // Basic Configuration 
-var port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
 /** this project needs a db !! **/ 
 // mongoose.connect(process.env.MONGOLAB_URI);
