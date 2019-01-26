@@ -35,9 +35,26 @@ app.get("/api/hello", function (req, res) {
 });
 
 app.post("/api/shorturl/new", function (req, res) {
-  // console.log(req.body.url);
-  res.send(req.body.url);
+  let url, urlStr = req.body.url.trim();
+  
+  // If submitted url doesn't start with 'http://' or 'https://' return early with error response.
+  if (!/^https?\:\/\//.test(urlStr)) return res.json({"ERROR": "INVALID URL"});
+
+  // Create a URL object from the submitted url
+  url = new URL(urlStr);
+  console.log(url);
+  
+  // verify url exists
+  dns.lookup(url.host + url.pathname, (err, address) => {
+    let log;
+    err ? log = err : log = address;
+    console.log(log);
+  });
+  // console.log(url);
+  res.json({"original_url": urlStr, "url": url.host});
+  // res.send("POST submitted");
 });
+
 
 
 app.listen(port, function () {
