@@ -9,7 +9,6 @@
 	"dependencies": {
 		"body-parser": "^1.15.2",
 		"cors": "^2.8.1",
-		"dotenv": "^6.2.0",
 		"express": "^5.0.0-alpha.2",
 		"mongodb": "^3.1.12",
 		"mongoose": "^5.4.6"
@@ -28,6 +27,7 @@
 	],
 	"license": "MIT",
 	"devDependencies": {
-		"nodemon": "^1.18.9"
+		"nodemon": "^1.18.9",
+		"dotenv": "^6.2.0"
 	}
 }
