@@ -34,6 +34,12 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+// shoturl req route
+app.get("/api/shorturl/:num?", function (req, res) {
+  let num = req.params.num;
+  res.send("num: " + num);
+});
+
 app.post("/api/shorturl/new", function (req, res) {
   let url, urlStr = req.body.url.trim();
   
