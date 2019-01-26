@@ -1,5 +1,5 @@
 'use strict';
-
+require('dotenv').config(); // comment this out on Glitch
 const express = require('express');
 const mongo = require('mongodb');
 const mongoose = require('mongoose');
@@ -13,7 +13,20 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 /** this project needs a db !! **/ 
-// mongoose.connect(process.env.MONGOLAB_URI);
+mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true});
+
+const Schema = mongoose.Schema;
+
+let shortUrlSchema = new Schema({
+  original_url: {
+    type: String,
+    required: true
+  },
+  short_url: Number
+});
+
+let ShortUrl = mongoose.model('ShortUrl', shortUrlSchema);
+
 
 app.use(cors());
 
