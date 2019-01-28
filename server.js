@@ -1,13 +1,12 @@
 'use strict';
 require('dotenv').config(); // comment this out on Glitch
 const express = require('express');
+const app = express();
 const mongo = require('mongodb');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const dns = require('dns');
 const cors = require('cors');
-
-const app = express();
 
 // Basic Configuration 
 const port = process.env.PORT || 3000;
@@ -54,26 +53,36 @@ app.get("/api/shorturl/:num?", function (req, res) {
 });
 
 app.post("/api/shorturl/new", function (req, res) {
+
+  /** Steps
+   * 1. Accept/verify url
+   * 2. dns verify host exists
+   * 3. Check db for ShortUrl docs - get count.
+   * 4. Create new ShortUrl doc using docs count + 1 as shorturl.
+   * 5. Save new ShortUrl to db.
+   */
   let url, urlStr = req.body.url.trim();
   
   // If submitted url doesn't start with 'http://' or 'https://' return early with error response.
   if (!/^https?\:\/\//.test(urlStr)) return res.json({"ERROR": "INVALID URL"});
 
-  // Create a URL object from the submitted url
   url = new URL(urlStr);
   console.log(url);
-  
-  // verify url exists
-  dns.lookup(url.host + url.pathname, (err, address) => {
-    let log;
-    err ? log = err : log = address;
-    console.log(log);
+
+
+  // verify host exists
+  dns.lookup(url.host, (err, address) => {
+    // let log;
+    // err ? log = err : log = address;
+    // console.log(log);
+    if (err) return res.json({"ERROR": "INVALID URL"});
+
+    res.json({"original_url": url.href, "url": "?"});
   });
-  // console.log(url);
-  res.json({"original_url": urlStr, "url": url.host});
+  // 
+  
   // res.send("POST submitted");
 });
-
 
 
 app.listen(port, function () {
