@@ -2,7 +2,7 @@
 require('dotenv').config(); // comment this out on Glitch
 const express = require('express');
 const app = express();
-const mongo = require('mongodb');
+// const mongo = require('mongodb'); // not sure why this was included w/the boilerplate 
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const dns = require('dns');
@@ -28,7 +28,6 @@ const shortUrlSchema = new Schema({
 
 const ShortUrl = mongoose.model('ShortUrl', shortUrlSchema);
 
-
 /** MIDDLEWARE */
 app.use(cors());
 
@@ -45,33 +44,25 @@ app.get('/', function(req, res){
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-  
 // your first API endpoint... 
 app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
-});
-
-app.get("/env", function (req, res) {
-  // res.json(process);
-  console.log(req.headers.host);
-  res.send('done');
-});
+});                          
 
 // shoturl req route
 app.get("/api/shorturl/:num?", function (req, res) {
-  let num = req.params.num;
-  res.send("num: " + num);
+  ShortUrl.findOne({short_url: req.params.num}, function (err, shortUrl) {
+    if (err) {
+      console.log(err);
+    } else {
+      // If shortUrl exists, redirect to the original_url, otherwise send json error.
+      shortUrl ? res.redirect(shortUrl.original_url) : res.json({"error": "invalid shortURL"}); 
+    }
+  });
 });
 
 app.post("/api/shorturl/new", [checkForDuplicateUrl, checkUrlAndHost, assignShortUrl], function (req, res) {
- console.log(req.body);
-  /** Steps
-   * 1. Accept/verify url
-   * 2. dns verify host exists
-   * 3. Check db for ShortUrl docs - get count.
-   * 4. Create new ShortUrl doc using docs count + 1 as shorturl.
-   * 5. Save new ShortUrl to db.
-   */
+
   let shortUrl = new ShortUrl({
     original_url: req.body.url,
     short_url: req.body.shorturl
@@ -79,12 +70,9 @@ app.post("/api/shorturl/new", [checkForDuplicateUrl, checkUrlAndHost, assignShor
 
   shortUrl.save((err, data) => err ? console.log(err) : res.json(data));
   
-  // res.send("POST submitted");
 });
 
 function checkUrlAndHost (req, res, next) {
-  // Trim any whitespace from the ends of the submitted url
-  // req.body.url = req.body.url.trim();
   // If submitted url doesn't start with 'http://' or 'https://' return early with error response.
   if (!/^https?\:\/\//.test(req.body.url)) {
     return res.json({"error":"invalid URL"});
@@ -101,12 +89,12 @@ function checkUrlAndHost (req, res, next) {
   }
 }
 
-
+// Assign shorturl nunber
 function assignShortUrl(req, res, next) {
   ShortUrl.countDocuments((err, count) => {
     if (err) {
       console.log(err)
-      res.json({"Error": "Database error"});
+      res.json({"error": "database error"});
     } else {
       req.body.shorturl = count + 1;
       next();
@@ -117,6 +105,8 @@ function assignShortUrl(req, res, next) {
 function checkForDuplicateUrl(req, res, next) {
   // Trim any whitespace from the ends of the submitted url
   req.body.url = req.body.url.trim();
+
+  // Check for duplicate - if exists, send response here with existing shorturl.
   ShortUrl.findOne({original_url: req.body.url}, function (err, shortUrl) {
     if (err) {
       console.log(err);
@@ -125,8 +115,6 @@ function checkForDuplicateUrl(req, res, next) {
     }
   });
 }
-
-
 
 app.listen(port, function () {
   console.log('Node.js listening ...');

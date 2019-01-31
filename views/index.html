@@ -30,7 +30,7 @@
           <input type="submit" value="POST URL">
         </form>
         <h3>Example Usage:</h3>
-        <a href="https://thread-paper.hyperdev.space/api/shorturl/3">
+        <a id="shorturl-link" href="#">
           [this_project_url]/api/shorturl/3
         </a>
 
@@ -39,10 +39,18 @@
       </div>
       <div class="footer">
         <p>
-          by <a href="http://www.freecodecamp.com">freeCodeCamp</a>
+          by <a href="https://github.com/brimarq">brimarq</a>
         </p>
+        <p>built upon the <a href="https://github.com/freeCodeCamp/boilerplate-project-urlshortener/">freeCodeCamp boilerplate</a></p>
       </div>
    </body>
 
+   <script type="text/javascript">
+     let baseURI = document.baseURI,
+     shortUrlPath = "api/shorturl/3",
+     shortUrlLink = document.getElementById('shorturl-link'); 
+     shortUrlLink.setAttribute("href", baseURI + shortUrlPath); 
+     shortUrlLink.textContent = baseURI + shortUrlPath;
+   </script>
 
 </html>
